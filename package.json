@@ -1,5 +1,5 @@
 {
-  "name": "vanzak-guard",
+  "name": "bot-discord",
   "version": "0.1.0",
   "description": "Bot responsavel pela seguranca operacional e controle dos canais do Discord.",
   "private": true,
