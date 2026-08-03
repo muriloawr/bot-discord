@@ -1,8 +1,9 @@
 {
   "timezone": "America/Sao_Paulo",
-  "meetingChannel": "",
+  "meetingChannel": "1397185885098741861",
+  "announceChannel": "1251176909044322364",
   "meetingStart": "11:30",
   "meetingEnd": "13:00",
   "warningMinutes": 5,
-  "ignoredRoles": ["CEO", "CTO", "Head", "Admin"]
+  "ignoredRoles": ["1251178516381175968"]
 }
