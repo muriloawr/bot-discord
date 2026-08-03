@@ -2,8 +2,8 @@
   "timezone": "America/Sao_Paulo",
   "meetingChannel": "1397185885098741861",
   "announceChannel": "1251176909044322364",
-  "meetingStart": "11:30",
-  "meetingEnd": "13:00",
-  "warningMinutes": 5,
+  "meetingStart": "04:22",
+  "meetingEnd": "04:26",
+  "warningMinutes": 2,
   "ignoredRoles": ["1251178516381175968"]
 }
