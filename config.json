@@ -14,6 +14,12 @@
       "end": "18:30",
       "warningMinutes": 5,
       "closeMessage": "Call encerrada. Bom descanso a todos!"
+    },
+    {
+      "start": "13:05",
+      "end": "13:09",
+      "warningMinutes": 2,
+      "closeMessage": "Teste concluido."
     }
   ],
   "ignoredRoles": ["1251178516381175968"]
