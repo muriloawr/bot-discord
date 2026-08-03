@@ -20,19 +20,19 @@ export async function openMeetingChannel(client: Client<true>, window: MeetingWi
   await setConnectAllowed(client, true);
 
   const announceChannel = await getAnnounceChannel(client);
-  await announceChannel.send(`Canal Reunião liberado até às ${window.end}.`);
+  await announceChannel.send(`Reunião liberado até às ${window.end} 🎉`);
 
   logAction("OPEN_CHANNEL", "system", appConfig.meetingChannel);
 }
 
 export async function sendWarning(client: Client<true>, window: MeetingWindow): Promise<void> {
   const announceChannel = await getAnnounceChannel(client);
-  await announceChannel.send(`Faltam ${window.warningMinutes} minutos para o encerramento.`);
+  await announceChannel.send(`Daqui ${window.warningMinutes} minutos a call Reunião será encerrada`);
 
   logAction("WARNING", "system", appConfig.meetingChannel);
 }
 
-export async function closeMeetingChannel(client: Client<true>): Promise<void> {
+export async function closeMeetingChannel(client: Client<true>, window: MeetingWindow): Promise<void> {
   await setConnectAllowed(client, false);
 
   const channel = await getMeetingChannel(client);
@@ -47,7 +47,7 @@ export async function closeMeetingChannel(client: Client<true>): Promise<void> {
   }
 
   const announceChannel = await getAnnounceChannel(client);
-  await announceChannel.send("Canal encerrado.\nBom trabalho a todos.");
+  await announceChannel.send(window.closeMessage);
 
   logAction("CLOSE_CHANNEL", "system", appConfig.meetingChannel);
 }

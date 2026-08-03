@@ -35,7 +35,7 @@ export function startScheduler(client: Client<true>): void {
     );
     cron.schedule(
       endCron,
-      runSafely(`fechar ${window.end}`, () => closeMeetingChannel(client)),
+      runSafely(`fechar ${window.end}`, () => closeMeetingChannel(client, window)),
       { timezone },
     );
 

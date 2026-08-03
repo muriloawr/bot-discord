@@ -3,8 +3,18 @@
   "meetingChannel": "1397185885098741861",
   "announceChannel": "1251176909044322364",
   "meetingWindows": [
-    { "start": "11:30", "end": "13:00", "warningMinutes": 5 },
-    { "start": "17:30", "end": "18:00", "warningMinutes": 5 }
+    {
+      "start": "11:30",
+      "end": "13:00",
+      "warningMinutes": 5,
+      "closeMessage": "Call encerrada. Bom trabalho a todos!"
+    },
+    {
+      "start": "17:00",
+      "end": "18:30",
+      "warningMinutes": 5,
+      "closeMessage": "Call encerrada. Bom descanso a todos!"
+    }
   ],
   "ignoredRoles": ["1251178516381175968"]
 }
