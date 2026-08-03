@@ -16,8 +16,8 @@
       "closeMessage": "Call encerrada. Bom descanso a todos!"
     },
     {
-      "start": "13:10",
-      "end": "13:12",
+      "start": "13:12",
+      "end": "13:14",
       "warningMinutes": 1,
       "closeMessage": "Teste concluido."
     }
