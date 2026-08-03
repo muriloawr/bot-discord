@@ -1,9 +1,13 @@
+export interface MeetingWindow {
+  start: string;
+  end: string;
+  warningMinutes: number;
+}
+
 export interface AppConfig {
   timezone: string;
   meetingChannel: string;
   announceChannel: string;
-  meetingStart: string;
-  meetingEnd: string;
-  warningMinutes: number;
+  meetingWindows: MeetingWindow[];
   ignoredRoles: string[];
 }

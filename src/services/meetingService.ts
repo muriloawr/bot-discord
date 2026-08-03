@@ -1,5 +1,6 @@
 import type { Client, SendableChannels } from "discord.js";
 import { appConfig } from "../config";
+import type { MeetingWindow } from "../types";
 import { isIgnoredMember } from "../middlewares/ignoredRoles";
 import { logAction } from "../database/actions";
 import { logViolation } from "../database/violations";
@@ -15,18 +16,18 @@ async function getAnnounceChannel(client: Client<true>): Promise<SendableChannel
   return channel;
 }
 
-export async function openMeetingChannel(client: Client<true>): Promise<void> {
+export async function openMeetingChannel(client: Client<true>, window: MeetingWindow): Promise<void> {
   await setConnectAllowed(client, true);
 
   const announceChannel = await getAnnounceChannel(client);
-  await announceChannel.send(`Canal Reunião liberado até às ${appConfig.meetingEnd}.`);
+  await announceChannel.send(`Canal Reunião liberado até às ${window.end}.`);
 
   logAction("OPEN_CHANNEL", "system", appConfig.meetingChannel);
 }
 
-export async function sendWarning(client: Client<true>): Promise<void> {
+export async function sendWarning(client: Client<true>, window: MeetingWindow): Promise<void> {
   const announceChannel = await getAnnounceChannel(client);
-  await announceChannel.send(`Faltam ${appConfig.warningMinutes} minutos para o encerramento.`);
+  await announceChannel.send(`Faltam ${window.warningMinutes} minutos para o encerramento.`);
 
   logAction("WARNING", "system", appConfig.meetingChannel);
 }

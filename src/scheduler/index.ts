@@ -5,10 +5,10 @@ import { logger } from "../utils/logger";
 import { openMeetingChannel, sendWarning, closeMeetingChannel } from "../services/meetingService";
 import { parseTime, subtractMinutes, toCronExpression } from "../utils/time";
 
-function runSafely(client: Client<true>, label: string, fn: (client: Client<true>) => Promise<void>) {
+function runSafely(label: string, fn: () => Promise<void>) {
   return async () => {
     try {
-      await fn(client);
+      await fn();
     } catch (error) {
       logger.error(`Falha ao executar job "${label}"`, error as Error);
     }
@@ -16,17 +16,31 @@ function runSafely(client: Client<true>, label: string, fn: (client: Client<true
 }
 
 export function startScheduler(client: Client<true>): void {
-  const { meetingStart, meetingEnd, warningMinutes, timezone } = appConfig;
+  const { meetingWindows, timezone } = appConfig;
 
-  const startCron = toCronExpression(parseTime(meetingStart));
-  const warningCron = toCronExpression(parseTime(subtractMinutes(meetingEnd, warningMinutes)));
-  const endCron = toCronExpression(parseTime(meetingEnd));
+  for (const window of meetingWindows) {
+    const startCron = toCronExpression(parseTime(window.start));
+    const warningCron = toCronExpression(parseTime(subtractMinutes(window.end, window.warningMinutes)));
+    const endCron = toCronExpression(parseTime(window.end));
 
-  cron.schedule(startCron, runSafely(client, "openMeetingChannel", openMeetingChannel), { timezone });
-  cron.schedule(warningCron, runSafely(client, "sendWarning", sendWarning), { timezone });
-  cron.schedule(endCron, runSafely(client, "closeMeetingChannel", closeMeetingChannel), { timezone });
+    cron.schedule(
+      startCron,
+      runSafely(`abrir ${window.start}`, () => openMeetingChannel(client, window)),
+      { timezone },
+    );
+    cron.schedule(
+      warningCron,
+      runSafely(`aviso ${window.start}`, () => sendWarning(client, window)),
+      { timezone },
+    );
+    cron.schedule(
+      endCron,
+      runSafely(`fechar ${window.end}`, () => closeMeetingChannel(client)),
+      { timezone },
+    );
 
-  logger.info(
-    `Scheduler ativo — abre ${meetingStart}, aviso ${warningMinutes}min antes, fecha ${meetingEnd} (${timezone})`,
-  );
+    logger.info(
+      `Janela registrada: abre ${window.start}, aviso ${window.warningMinutes}min antes, fecha ${window.end} (${timezone})`,
+    );
+  }
 }
