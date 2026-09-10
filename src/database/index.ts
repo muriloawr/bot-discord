@@ -30,7 +30,14 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS presence_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId TEXT NOT NULL,
+    channel TEXT NOT NULL DEFAULT '',
     joinedAt TEXT NOT NULL,
     leftAt TEXT
   );
 `);
+
+try {
+  db.exec("ALTER TABLE presence_sessions ADD COLUMN channel TEXT NOT NULL DEFAULT ''");
+} catch {
+  // coluna ja existe (tabela criada antes dessa versao)
+}
