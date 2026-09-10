@@ -11,12 +11,9 @@ export function execute(oldState: VoiceState, newState: VoiceState): void {
 
   touchUser(member.id, member.user.tag);
 
-  if (!oldState.channelId && newState.channelId) {
-    startPresence(member.id);
-  }
-
-  if (oldState.channelId && !newState.channelId) {
-    endPresence(member.id);
+  if (oldState.channelId !== newState.channelId) {
+    if (oldState.channelId) endPresence(member.id, oldState.channelId);
+    if (newState.channelId) startPresence(member.id, newState.channelId);
   }
 
   if (newState.channelId && newState.channelId !== oldState.channelId) {

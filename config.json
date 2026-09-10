@@ -4,6 +4,10 @@
   "announceChannel": "1251176909044322364",
   "reportChannel": "1547653022203519156",
   "dailyReportTime": "19:00",
+  "breakChannels": [
+    { "id": "1356645058526314617", "label": "Intervalo" },
+    { "id": "1366850503706935429", "label": "Banheiro" }
+  ],
   "meetingWindows": [
     {
       "start": "11:30",

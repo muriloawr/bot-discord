@@ -7,6 +7,11 @@ export interface MeetingWindow {
   closeMessage: string;
 }
 
+export interface BreakChannel {
+  id: string;
+  label: string;
+}
+
 export interface AppConfig {
   timezone: string;
   meetingChannel: string;
@@ -15,6 +20,7 @@ export interface AppConfig {
   dailyReportTime: string;
   meetingWindows: MeetingWindow[];
   ignoredRoles: string[];
+  breakChannels: BreakChannel[];
 }
 
 export interface Command {
