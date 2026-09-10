@@ -24,24 +24,26 @@ function truncate(content: string): string {
 
 interface PresenceTotal {
   name: string;
-  minutes: number;
+  seconds: number;
 }
 
 function sortedTotals(totals: Map<string, PresenceTotal>): PresenceTotal[] {
-  return [...totals.values()].sort((a, b) => b.minutes - a.minutes);
+  return [...totals.values()].sort(
+    (a, b) => b.seconds - a.seconds || a.name.localeCompare(b.name, "pt-BR"),
+  );
 }
 
-function addMinutes(totals: Map<string, PresenceTotal>, userId: string, name: string, minutes: number) {
-  const entry = totals.get(userId) ?? { name, minutes: 0 };
-  entry.minutes += minutes;
+function addSeconds(totals: Map<string, PresenceTotal>, userId: string, name: string, seconds: number) {
+  const entry = totals.get(userId) ?? { name, seconds: 0 };
+  entry.seconds += seconds;
   totals.set(userId, entry);
 }
 
 function summarizePresence(
   dateKey: string,
   timezone: string,
-): { work: PresenceTotal[]; breaks: { label: string; totals: PresenceTotal[] }[] } {
-  const breakChannelLabels = new Map(appConfig.breakChannels.map((bc) => [bc.id, bc.label]));
+): { work: PresenceTotal[]; breaks: { label: string; emoji: string; totals: PresenceTotal[] }[] } {
+  const breakChannelIds = new Set(appConfig.breakChannels.map((bc) => bc.id));
 
   const workTotals = new Map<string, PresenceTotal>();
   const breakTotals = new Map<string, Map<string, PresenceTotal>>();
@@ -56,13 +58,13 @@ function summarizePresence(
   for (const session of sessions) {
     const joinedAt = new Date(session.joinedAt).getTime();
     const leftAt = session.leftAt ? new Date(session.leftAt).getTime() : Date.now();
-    const minutes = Math.max(0, Math.round((leftAt - joinedAt) / 60000));
+    const seconds = Math.max(0, Math.round((leftAt - joinedAt) / 1000));
     const name = session.username ?? session.userId;
 
-    if (breakChannelLabels.has(session.channel)) {
-      addMinutes(breakTotals.get(session.channel)!, session.userId, name, minutes);
+    if (breakChannelIds.has(session.channel)) {
+      addSeconds(breakTotals.get(session.channel)!, session.userId, name, seconds);
     } else {
-      addMinutes(workTotals, session.userId, name, minutes);
+      addSeconds(workTotals, session.userId, name, seconds);
     }
   }
 
@@ -70,6 +72,7 @@ function summarizePresence(
     work: sortedTotals(workTotals),
     breaks: appConfig.breakChannels.map((breakChannel) => ({
       label: breakChannel.label,
+      emoji: breakChannel.emoji,
       totals: sortedTotals(breakTotals.get(breakChannel.id) ?? new Map()),
     })),
   };
@@ -80,7 +83,7 @@ function renderPresenceLines(title: string, totals: PresenceTotal[], emptyMessag
 
   const lines = [`${title} (${totals.length} pessoa(s))`];
   for (const entry of totals) {
-    lines.push(`• ${entry.name}: ${formatDuration(entry.minutes)}`);
+    lines.push(`• ${entry.name}: ${formatDuration(entry.seconds)}`);
   }
   return lines;
 }
@@ -101,13 +104,11 @@ export function buildDailyReport(dateKey: string): string {
   );
 
   for (const breakGroup of presence.breaks) {
+    if (breakGroup.totals.length === 0) continue;
+
     lines.push("");
     lines.push(
-      ...renderPresenceLines(
-        `🚪 **Tempo em ${breakGroup.label}**`,
-        breakGroup.totals,
-        `🚪 Nenhum tempo em ${breakGroup.label} registrado.`,
-      ),
+      ...renderPresenceLines(`${breakGroup.emoji} **Tempo em ${breakGroup.label}**`, breakGroup.totals, ""),
     );
   }
 

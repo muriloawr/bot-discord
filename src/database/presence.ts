@@ -12,10 +12,36 @@ export function endPresence(userId: string, channel: string): void {
   ).run(new Date().toISOString(), userId, channel);
 }
 
-export function closeAllOpenPresences(): void {
-  db.prepare("UPDATE presence_sessions SET leftAt = ? WHERE leftAt IS NULL").run(
-    new Date().toISOString(),
-  );
+/**
+ * Reconcilia as sessões abertas com quem está de fato conectado agora (chamado
+ * no boot do bot). Sessão cujo canal ainda bate com o estado atual fica aberta
+ * como estava, preservando o tempo acumulado através de um restart/deploy.
+ * Só fecha e reabre sessões de quem saiu ou trocou de canal enquanto o bot
+ * estava fora do ar.
+ */
+export function reconcilePresence(connectedByUser: Map<string, string>): void {
+  const now = new Date().toISOString();
+
+  const openSessions = db
+    .prepare("SELECT userId, channel FROM presence_sessions WHERE leftAt IS NULL")
+    .all() as unknown as { userId: string; channel: string }[];
+
+  const stillOpen = new Set<string>();
+
+  for (const session of openSessions) {
+    if (connectedByUser.get(session.userId) === session.channel) {
+      stillOpen.add(session.userId);
+      continue;
+    }
+
+    db.prepare(
+      "UPDATE presence_sessions SET leftAt = ? WHERE userId = ? AND channel = ? AND leftAt IS NULL",
+    ).run(now, session.userId, session.channel);
+  }
+
+  for (const [userId, channel] of connectedByUser) {
+    if (!stillOpen.has(userId)) startPresence(userId, channel);
+  }
 }
 
 export interface PresenceRecord {
