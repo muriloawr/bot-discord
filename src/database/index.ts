@@ -26,4 +26,11 @@ db.exec(`
     target TEXT NOT NULL,
     createdAt TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS presence_sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId TEXT NOT NULL,
+    joinedAt TEXT NOT NULL,
+    leftAt TEXT
+  );
 `);

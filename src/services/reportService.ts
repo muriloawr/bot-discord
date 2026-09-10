@@ -1,8 +1,9 @@
 import type { Client, SendableChannels } from "discord.js";
 import { appConfig } from "../config";
 import { listActions, listViolations } from "../database/reports";
+import { listPresenceSessions } from "../database/presence";
 import { logger } from "../utils/logger";
-import { toDateKey, toDisplayDate, toDisplayTime } from "../utils/time";
+import { formatDuration, toDateKey, toDisplayDate, toDisplayTime } from "../utils/time";
 
 const ACTION_LABELS: Record<string, string> = {
   OPEN_CHANNEL: "Call aberta",
@@ -28,6 +29,34 @@ function truncate(content: string): string {
   return `${content.slice(0, MAX_MESSAGE_LENGTH)}\n… (relatório truncado, muitos eventos nesse dia)`;
 }
 
+interface PresenceTotal {
+  name: string;
+  minutes: number;
+}
+
+function summarizePresence(dateKey: string, timezone: string): PresenceTotal[] {
+  const totals = new Map<string, PresenceTotal>();
+
+  const sessions = listPresenceSessions().filter(
+    (session) => toDateKey(new Date(session.joinedAt), timezone) === dateKey,
+  );
+
+  for (const session of sessions) {
+    const joinedAt = new Date(session.joinedAt).getTime();
+    const leftAt = session.leftAt ? new Date(session.leftAt).getTime() : Date.now();
+    const minutes = Math.max(0, Math.round((leftAt - joinedAt) / 60000));
+
+    const entry = totals.get(session.userId) ?? {
+      name: session.username ?? session.userId,
+      minutes: 0,
+    };
+    entry.minutes += minutes;
+    totals.set(session.userId, entry);
+  }
+
+  return [...totals.values()].sort((a, b) => b.minutes - a.minutes);
+}
+
 export function buildDailyReport(dateKey: string): string {
   const { timezone } = appConfig;
 
@@ -40,7 +69,20 @@ export function buildDailyReport(dateKey: string): string {
   const pulls = actions.filter((action) => action.type === "PULL_MEMBER");
   const systemActions = actions.filter((action) => action.type !== "PULL_MEMBER");
 
+  const presenceTotals = summarizePresence(dateKey, timezone);
+
   const lines: string[] = [`📋 **Relatório — ${toDisplayDate(dateKey)}**`, ""];
+
+  if (presenceTotals.length === 0) {
+    lines.push("⏱ Nenhum tempo de call registrado.");
+  } else {
+    lines.push(`⏱ **Tempo em call (${presenceTotals.length} pessoa(s))**`);
+    for (const entry of presenceTotals) {
+      lines.push(`• ${entry.name}: ${formatDuration(entry.minutes)}`);
+    }
+  }
+
+  lines.push("");
 
   if (violations.length === 0) {
     lines.push("🟢 Nenhuma violação registrada.");
