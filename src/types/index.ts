@@ -11,6 +11,8 @@ export interface AppConfig {
   timezone: string;
   meetingChannel: string;
   announceChannel: string;
+  reportChannel: string;
+  dailyReportTime: string;
   meetingWindows: MeetingWindow[];
   ignoredRoles: string[];
 }
