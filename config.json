@@ -2,6 +2,8 @@
   "timezone": "America/Sao_Paulo",
   "meetingChannel": "1397185885098741861",
   "announceChannel": "1251176909044322364",
+  "reportChannel": "1547653022203519156",
+  "dailyReportTime": "19:00",
   "meetingWindows": [
     {
       "start": "11:30",

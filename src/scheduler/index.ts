@@ -3,6 +3,7 @@ import type { Client } from "discord.js";
 import { appConfig } from "../config";
 import { logger } from "../utils/logger";
 import { openMeetingChannel, sendWarning, closeMeetingChannel } from "../services/meetingService";
+import { sendDailyReport } from "../services/reportService";
 import { parseTime, subtractMinutes, toCronExpression } from "../utils/time";
 
 function runSafely(label: string, fn: () => Promise<void>) {
@@ -16,7 +17,14 @@ function runSafely(label: string, fn: () => Promise<void>) {
 }
 
 export function startScheduler(client: Client<true>): void {
-  const { meetingWindows, timezone } = appConfig;
+  const { meetingWindows, timezone, dailyReportTime } = appConfig;
+
+  cron.schedule(
+    toCronExpression(parseTime(dailyReportTime)),
+    runSafely("relatorio diario", () => sendDailyReport(client)),
+    { timezone },
+  );
+  logger.info(`Relatório diário agendado para ${dailyReportTime} (${timezone})`);
 
   for (const window of meetingWindows) {
     const startCron = toCronExpression(parseTime(window.start));
