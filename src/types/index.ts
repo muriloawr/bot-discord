@@ -10,6 +10,7 @@ export interface MeetingWindow {
 export interface BreakChannel {
   id: string;
   label: string;
+  emoji: string;
 }
 
 export interface AppConfig {

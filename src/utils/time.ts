@@ -42,12 +42,17 @@ export function toDisplayDate(dateKey: string): string {
   return `${day}/${month}/${year}`;
 }
 
-export function formatDuration(totalMinutes: number): string {
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  if (hours === 0) return `${minutes}min`;
-  if (minutes === 0) return `${hours}h`;
-  return `${hours}h${minutes}min`;
+export function formatDuration(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const parts: string[] = [];
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}min`);
+  if (seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
+
+  return parts.join("");
 }
 
 export function parseBRDate(input: string): string | null {
