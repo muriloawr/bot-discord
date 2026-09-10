@@ -9,7 +9,7 @@ export function execute(oldState: VoiceState, newState: VoiceState): void {
   const member = newState.member ?? oldState.member;
   if (!member) return;
 
-  touchUser(member.id, member.user.tag);
+  touchUser(member.id, member.displayName);
 
   if (oldState.channelId !== newState.channelId) {
     if (oldState.channelId) endPresence(member.id, oldState.channelId);

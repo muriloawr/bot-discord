@@ -16,7 +16,7 @@ export function execute(client: Client<true>) {
   if (guild) {
     for (const voiceState of guild.voiceStates.cache.values()) {
       if (!voiceState.channelId || !voiceState.member) continue;
-      touchUser(voiceState.member.id, voiceState.member.user.tag);
+      touchUser(voiceState.member.id, voiceState.member.displayName);
       startPresence(voiceState.member.id, voiceState.channelId);
     }
   }
