@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits } from "discord.js";
 import { env } from "./config";
 import { logger } from "./utils/logger";
 import { loadEvents } from "./events";
+import { loadCommands } from "./commands";
 import "./database";
 
 const client = new Client({
@@ -13,6 +14,7 @@ const client = new Client({
 });
 
 loadEvents(client);
+loadCommands(client);
 
 client.login(env.discordToken).catch((error) => {
   logger.error("Failed to log in to Discord", error);

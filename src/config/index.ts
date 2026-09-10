@@ -19,6 +19,7 @@ function requireEnv(name: string): string {
 export const env = {
   discordToken: requireEnv("DISCORD_TOKEN"),
   guildId: requireEnv("GUILD_ID"),
+  clientId: requireEnv("CLIENT_ID"),
   nodeEnv: process.env.NODE_ENV ?? "development",
   logLevel: process.env.LOG_LEVEL ?? "info",
 };
