@@ -1,16 +1,9 @@
 import type { Client, SendableChannels } from "discord.js";
 import { appConfig } from "../config";
-import { listActions, listViolations } from "../database/reports";
+import { listActions } from "../database/reports";
 import { listPresenceSessions } from "../database/presence";
 import { logger } from "../utils/logger";
 import { formatDuration, toDateKey, toDisplayDate, toDisplayTime } from "../utils/time";
-
-const ACTION_LABELS: Record<string, string> = {
-  OPEN_CHANNEL: "Call aberta",
-  WARNING: "Aviso de encerramento enviado",
-  CLOSE_CHANNEL: "Call encerrada",
-  DISCONNECT: "Membro desconectado",
-};
 
 const MAX_MESSAGE_LENGTH = 1900;
 
@@ -60,14 +53,9 @@ function summarizePresence(dateKey: string, timezone: string): PresenceTotal[] {
 export function buildDailyReport(dateKey: string): string {
   const { timezone } = appConfig;
 
-  const violations = listViolations().filter(
-    (violation) => toDateKey(new Date(violation.date), timezone) === dateKey,
-  );
-  const actions = listActions().filter(
-    (action) => toDateKey(new Date(action.createdAt), timezone) === dateKey,
-  );
-  const pulls = actions.filter((action) => action.type === "PULL_MEMBER");
-  const systemActions = actions.filter((action) => action.type !== "PULL_MEMBER");
+  const pulls = listActions()
+    .filter((action) => action.type === "PULL_MEMBER")
+    .filter((action) => toDateKey(new Date(action.createdAt), timezone) === dateKey);
 
   const presenceTotals = summarizePresence(dateKey, timezone);
 
@@ -84,19 +72,6 @@ export function buildDailyReport(dateKey: string): string {
 
   lines.push("");
 
-  if (violations.length === 0) {
-    lines.push("🟢 Nenhuma violação registrada.");
-  } else {
-    lines.push(`🔴 **Violações (${violations.length})**`);
-    for (const violation of violations) {
-      const name = violation.username ?? violation.userId;
-      const time = toDisplayTime(new Date(violation.date), timezone);
-      lines.push(`• ${time} — ${name}: ${violation.reason}`);
-    }
-  }
-
-  lines.push("");
-
   if (pulls.length === 0) {
     lines.push("🔊 Nenhum /puxar usado.");
   } else {
@@ -106,25 +81,6 @@ export function buildDailyReport(dateKey: string): string {
       const targetName = pull.targetName ?? pull.target;
       const time = toDisplayTime(new Date(pull.createdAt), timezone);
       lines.push(`• ${time} — ${executorName} puxou ${targetName}`);
-    }
-  }
-
-  lines.push("");
-
-  if (systemActions.length === 0) {
-    lines.push("⚙️ Nenhum evento de sistema.");
-  } else {
-    lines.push(`⚙️ **Eventos do sistema (${systemActions.length})**`);
-    for (const action of systemActions) {
-      const time = toDisplayTime(new Date(action.createdAt), timezone);
-      const label = ACTION_LABELS[action.type] ?? action.type;
-
-      if (action.type === "DISCONNECT") {
-        const targetName = action.targetName ?? action.target;
-        lines.push(`• ${time} — ${label}: ${targetName}`);
-      } else {
-        lines.push(`• ${time} — ${label}`);
-      }
     }
   }
 
