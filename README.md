@@ -14,6 +14,7 @@ Preencha o `.env`:
 - `DISCORD_TOKEN` — token do bot, gerado no [Discord Developer Portal](https://discord.com/developers/applications)
 - `GUILD_ID` — ID do servidor Discord
 - `CLIENT_ID` — ID da aplicação (application ID), usado para registrar os slash commands
+- `DATA_DIR` — opcional. Pasta onde o SQLite (`vanzak-guard.sqlite`) é salvo. Em produção (Railway) **precisa** apontar para um Volume persistente (veja seção "Persistência de dados" abaixo). Localmente pode deixar em branco.
 
 Ajuste as regras em `config.json` (horários, canal da reunião, cargos ignorados).
 
@@ -62,6 +63,23 @@ permissões:
 Isso é uma permissão de cargo (concedida só ao bot), não uma permissão por
 canal — então os membros continuam sem poder mover uns aos outros
 diretamente, só através do comando.
+
+## Persistência de dados (Railway)
+
+O bot guarda tudo (usuários, violações, ações, tempo em call) num arquivo
+SQLite local. Um **Background Worker no Railway sem Volume anexado tem
+sistema de arquivos efêmero** — toda vez que sobe um deploy novo, esse
+arquivo é recriado vazio e o histórico anterior se perde.
+
+Pra evitar isso:
+
+1. No serviço do bot no Railway: **Settings → Volumes → New Volume**.
+2. Defina um **Mount Path**, por exemplo `/data`.
+3. Em **Variables**, adicione `DATA_DIR=/data` (o mesmo caminho do mount).
+4. Faça um novo deploy.
+
+A partir daí o arquivo `vanzak-guard.sqlite` fica dentro do Volume e
+sobrevive aos deploys seguintes.
 
 ## Deploy
 

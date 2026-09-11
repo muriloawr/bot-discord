@@ -1,7 +1,8 @@
 import { DatabaseSync } from "node:sqlite";
 import { join } from "node:path";
+import { env } from "../config";
 
-export const db = new DatabaseSync(join(process.cwd(), "vanzak-guard.sqlite"));
+export const db = new DatabaseSync(join(env.dataDir, "vanzak-guard.sqlite"));
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
