@@ -10,12 +10,6 @@
   ],
   "meetingWindows": [
     {
-      "start": "13:25",
-      "end": "14:05",
-      "warningMinutes": 5,
-      "closeMessage": "Call de teste encerrada."
-    },
-    {
       "start": "11:30",
       "end": "13:00",
       "warningMinutes": 5,
