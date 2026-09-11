@@ -41,7 +41,7 @@ src/
   scheduler/    # jobs agendados (node-cron)
   middlewares/  # checagens de permissão/cargo
   config/       # carregamento de config.json + env
-  database/     # SQLite (better-sqlite3)
+  database/     # SQLite (node:sqlite)
   utils/        # logger, helpers
   types/        # tipos compartilhados
 ```
