@@ -28,10 +28,12 @@ export async function execute(interaction: ChatInputCommandInteraction<"cached">
   }
 
   const meetingChannel = await getMeetingChannel(interaction.client);
+  const breakChannelIds = new Set(appConfig.breakChannels.map((breakChannel) => breakChannel.id));
 
   let moved = 0;
   for (const voiceState of interaction.guild.voiceStates.cache.values()) {
     if (!voiceState.channelId || voiceState.channelId === meetingChannel.id) continue;
+    if (breakChannelIds.has(voiceState.channelId)) continue;
 
     const member = voiceState.member;
     if (!member || isIgnoredMember(member)) continue;
