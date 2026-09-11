@@ -5,7 +5,6 @@ import {
 } from "discord.js";
 import { appConfig } from "../config";
 import { getMeetingChannel } from "../services/permissionManager";
-import { isIgnoredMember } from "../middlewares/ignoredRoles";
 import { logAction } from "../database/actions";
 import { logger } from "../utils/logger";
 import { isWithinAnyWindow } from "../utils/time";
@@ -36,7 +35,7 @@ export async function execute(interaction: ChatInputCommandInteraction<"cached">
     if (breakChannelIds.has(voiceState.channelId)) continue;
 
     const member = voiceState.member;
-    if (!member || isIgnoredMember(member)) continue;
+    if (!member) continue;
 
     try {
       await member.voice.setChannel(
