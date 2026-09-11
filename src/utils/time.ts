@@ -20,6 +20,39 @@ export function toCronExpression({ hour, minute }: TimeParts): string {
   return `${minute} ${hour} * * *`;
 }
 
+function minutesSinceMidnight(date: Date, timeZone: string): number {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+
+  const hour = Number(parts.find((part) => part.type === "hour")?.value);
+  const minute = Number(parts.find((part) => part.type === "minute")?.value);
+  return hour * 60 + minute;
+}
+
+export function isWithinWindow(
+  date: Date,
+  window: { start: string; end: string },
+  timeZone: string,
+): boolean {
+  const now = minutesSinceMidnight(date, timeZone);
+  const { hour: startHour, minute: startMinute } = parseTime(window.start);
+  const { hour: endHour, minute: endMinute } = parseTime(window.end);
+
+  return now >= startHour * 60 + startMinute && now < endHour * 60 + endMinute;
+}
+
+export function isWithinAnyWindow(
+  date: Date,
+  windows: { start: string; end: string }[],
+  timeZone: string,
+): boolean {
+  return windows.some((window) => isWithinWindow(date, window, timeZone));
+}
+
 export function toDateKey(date: Date, timeZone: string): string {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone,
