@@ -1,17 +1,22 @@
-import { SlashCommandBuilder, type ChatInputCommandInteraction } from "discord.js";
+import {
+  PermissionFlagsBits,
+  SlashCommandBuilder,
+  type ChatInputCommandInteraction,
+} from "discord.js";
 import { appConfig } from "../config";
 import { buildDailyReport } from "../services/reportService";
 import { parseBRDate, toDateKey } from "../utils/time";
 
 export const data = new SlashCommandBuilder()
   .setName("relatorio")
-  .setDescription("Mostra o relatório de violações e eventos de um dia")
+  .setDescription("Mostra o tempo em call, intervalo e banheiro de um dia")
   .addStringOption((option) =>
     option
       .setName("data")
       .setDescription("Data no formato dd/mm/aaaa (padrão: hoje)")
       .setRequired(false),
   )
+  .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
   .setDMPermission(false);
 
 export async function execute(interaction: ChatInputCommandInteraction<"cached">): Promise<void> {
