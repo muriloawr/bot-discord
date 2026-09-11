@@ -22,6 +22,7 @@ export const env = {
   clientId: requireEnv("CLIENT_ID"),
   nodeEnv: process.env.NODE_ENV ?? "development",
   logLevel: process.env.LOG_LEVEL ?? "info",
+  dataDir: process.env.DATA_DIR ?? process.cwd(),
 };
 
 export const appConfig: AppConfig = loadAppConfig();
