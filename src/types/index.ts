@@ -1,12 +1,5 @@
 import type { ChatInputCommandInteraction, Collection, SlashCommandBuilder } from "discord.js";
 
-export interface MeetingWindow {
-  start: string;
-  end: string;
-  warningMinutes: number;
-  closeMessage: string;
-}
-
 export interface BreakChannel {
   id: string;
   label: string;
@@ -15,12 +8,8 @@ export interface BreakChannel {
 
 export interface AppConfig {
   timezone: string;
-  meetingChannel: string;
-  announceChannel: string;
   reportChannel: string;
   dailyReportTime: string;
-  meetingWindows: MeetingWindow[];
-  ignoredRoles: string[];
   breakChannels: BreakChannel[];
 }
 

@@ -8,49 +8,8 @@ export function parseTime(hhmm: string): TimeParts {
   return { hour, minute };
 }
 
-export function subtractMinutes(hhmm: string, minutesToSubtract: number): string {
-  const { hour, minute } = parseTime(hhmm);
-  const totalMinutes = (hour * 60 + minute - minutesToSubtract + 24 * 60) % (24 * 60);
-  const newHour = Math.floor(totalMinutes / 60);
-  const newMinute = totalMinutes % 60;
-  return `${String(newHour).padStart(2, "0")}:${String(newMinute).padStart(2, "0")}`;
-}
-
 export function toCronExpression({ hour, minute }: TimeParts): string {
   return `${minute} ${hour} * * *`;
-}
-
-function minutesSinceMidnight(date: Date, timeZone: string): number {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone,
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).formatToParts(date);
-
-  const hour = Number(parts.find((part) => part.type === "hour")?.value);
-  const minute = Number(parts.find((part) => part.type === "minute")?.value);
-  return hour * 60 + minute;
-}
-
-export function isWithinWindow(
-  date: Date,
-  window: { start: string; end: string },
-  timeZone: string,
-): boolean {
-  const now = minutesSinceMidnight(date, timeZone);
-  const { hour: startHour, minute: startMinute } = parseTime(window.start);
-  const { hour: endHour, minute: endMinute } = parseTime(window.end);
-
-  return now >= startHour * 60 + startMinute && now < endHour * 60 + endMinute;
-}
-
-export function isWithinAnyWindow(
-  date: Date,
-  windows: { start: string; end: string }[],
-  timeZone: string,
-): boolean {
-  return windows.some((window) => isWithinWindow(date, window, timeZone));
 }
 
 export function toDateKey(date: Date, timeZone: string): string {

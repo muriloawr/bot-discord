@@ -16,7 +16,7 @@ Preencha o `.env`:
 - `CLIENT_ID` — ID da aplicação (application ID), usado para registrar os slash commands
 - `DATA_DIR` — opcional. Pasta onde o SQLite (`vanzak-guard.sqlite`) é salvo. Em produção (Railway) **precisa** apontar para um Volume persistente (veja seção "Persistência de dados" abaixo). Localmente pode deixar em branco.
 
-Ajuste as regras em `config.json` (horários, canal da reunião, cargos ignorados).
+Ajuste as regras em `config.json` (canal e horário do relatório diário, canais de intervalo/banheiro).
 
 ## Scripts
 
@@ -39,12 +39,23 @@ src/
   events/       # handlers de eventos do Discord Gateway
   services/     # regras de negócio (fase 2+)
   scheduler/    # jobs agendados (node-cron)
-  middlewares/  # checagens de permissão/cargo
   config/       # carregamento de config.json + env
   database/     # SQLite (node:sqlite)
   utils/        # logger, helpers
   types/        # tipos compartilhados
 ```
+
+## Comando `/relatorio`
+
+Mostra o tempo em call, intervalo e banheiro de cada pessoa num dia, além dos
+`/puxar` usados. Uso: `/relatorio` (hoje) ou `/relatorio data:dd/mm/aaaa`.
+
+O mesmo relatório é enviado automaticamente todo dia no canal `reportChannel`,
+no horário `dailyReportTime` do `config.json`.
+
+> A abertura/fechamento automático da call Reunião (com avisos e desconexão de
+> quem ficava depois do horário) e o comando `/agregar` foram descontinuados
+> por enquanto. O código continua no histórico do git caso voltem.
 
 ## Comando `/puxar`
 
@@ -66,7 +77,7 @@ diretamente, só através do comando.
 
 ## Persistência de dados (Railway)
 
-O bot guarda tudo (usuários, violações, ações, tempo em call) num arquivo
+O bot guarda tudo (usuários, ações, tempo em call) num arquivo
 SQLite local. Um **Background Worker no Railway sem Volume anexado tem
 sistema de arquivos efêmero** — toda vez que sobe um deploy novo, esse
 arquivo é recriado vazio e o histórico anterior se perde.
